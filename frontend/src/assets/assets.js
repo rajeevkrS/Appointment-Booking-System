@@ -340,4 +340,19 @@ export const doctors = [
       line2: "Circle, Ring Road, London",
     },
   },
+  {
+    _id: "doc15",
+    name: "Dr. Amelia Hill",
+    image: doc15,
+    speciality: "Gastroenterologist",
+    degree: "MBBS",
+    experience: "6 Years",
+    about:
+      "Dr. Davis has a strong commitment to delivering comprehensive medical care, focusing on preventive medicine, early diagnosis, and effective treatment strategies. Dr. Davis has a strong commitment to delivering comprehensive medical care, focusing on preventive medicine, early diagnosis, and effective treatment strategies.",
+    fees: 30,
+    address: {
+      line1: "37th Cross, Richmond",
+      line2: "Circle, Ring Road, London",
+    },
+  },
 ];
