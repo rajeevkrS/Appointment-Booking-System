@@ -10,35 +10,38 @@ const Navbar = () => {
   const [token, setToken] = useState(true);
 
   const handleStickyNavbar = () => {
-    window.addEventListener("scroll", () => {
-      if (
-        document.body.scrollTop > 80 ||
-        document.documentElement.scrollTop > 80
-      ) {
-        navRef.current.classList.add("sticky_nav");
-      } else {
-        navRef.current.classList.remove("sticky_nav");
-      }
-    });
+    if (
+      document.body.scrollTop > 80 ||
+      document.documentElement.scrollTop > 80
+    ) {
+      navRef.current.classList.add("sticky_nav");
+    } else {
+      navRef.current.classList.remove("sticky_nav");
+    }
   };
 
   useEffect(() => {
-    handleStickyNavbar();
+    window.addEventListener("scroll", handleStickyNavbar);
 
     return () => window.removeEventListener("scroll", handleStickyNavbar);
   }, []);
 
-  const toggleMenu = () => {
-    setShowMenu(!showMenu);
-  };
+  // Disable scroll on body when mobile menu is open
+  useEffect(() => {
+    if (showMenu) {
+      document.body.classList.add("overflow-hidden");
+    } else {
+      document.body.classList.remove("overflow-hidden");
+    }
+  }, [showMenu]);
 
   return (
     <div
-      className="header flex items-center justify-between text-sm p-4 mb-5 border-b border-b-gray-400"
-      ref={navRef}
+      className="header flex items-center justify-between text-sm p-2 mb-5 border-b border-b-gray-400"
+      ref={navRef} // This should be the correct ref
     >
       <img
-        className="w-44 cursor-pointer"
+        className="w-40 md:w-44 cursor-pointer"
         src={assets.logo}
         alt=""
         onClick={() => navigate("/")}
@@ -67,41 +70,33 @@ const Navbar = () => {
 
       <div className="flex items-center gap-4">
         {token ? (
-          <div className="flex items-center gap-2 cursor-pointer relative">
+          <div className="flex items-center gap-2 cursor-pointer group relative">
             <img className="w-8 rounded-full" src={assets.profile_pic} alt="" />
-            <img
-              className="w-2.5"
-              src={assets.dropdown_icon}
-              alt=""
-              onClick={toggleMenu}
-            />
+            <img className="w-2.5" src={assets.dropdown_icon} alt="" />
+            <div className="absolute top-0 right-0 pt-14 text-base font-medium text-gray-600 z-20 hidden group-hover:block">
+              <div className="min-w-48 bg-stone-100 rounded flex flex-col gap-4 p-4">
+                <p
+                  onClick={() => navigate("/my-profile")}
+                  className="hover:text-black cursor-pointer"
+                >
+                  My Profile
+                </p>
 
-            {showMenu && ( // Conditionally render the dropdown menu
-              <div className="absolute top-10 right-0 text-base font-medium text-gray-600 z-20">
-                <div className="min-w-48 bg-stone-100 rounded flex flex-col gap-4 p-4">
-                  <p
-                    onClick={() => navigate("/my-profile")}
-                    className="hover:text-black cursor-pointer"
-                  >
-                    My Profile
-                  </p>
+                <p
+                  onClick={() => navigate("/my-appointments")}
+                  className="hover:text-black cursor-pointer"
+                >
+                  My Appointment
+                </p>
 
-                  <p
-                    onClick={() => navigate("/my-appointments")}
-                    className="hover:text-black cursor-pointer"
-                  >
-                    My Appointment
-                  </p>
-
-                  <p
-                    onClick={() => setToken(false)}
-                    className="hover:text-black cursor-pointer"
-                  >
-                    Logout
-                  </p>
-                </div>
+                <p
+                  onClick={() => setToken(false)}
+                  className="hover:text-black cursor-pointer"
+                >
+                  Logout
+                </p>
               </div>
-            )}
+            </div>
           </div>
         ) : (
           <button
@@ -111,6 +106,48 @@ const Navbar = () => {
             Create Account
           </button>
         )}
+
+        <img
+          onClick={() => setShowMenu(true)}
+          src={assets.menu_icon}
+          alt=""
+          className="w-6 md:hidden cursor-pointer"
+        />
+
+        {/* ------Mobile Menu----- */}
+        <div
+          className={`${
+            showMenu ? "fixed w-full h-screen" : "hidden"
+          } md:hidden right-0 top-0 bottom-0 z-20 overflow-hidden bg-white transition-all`}
+        >
+          <div className="flex items-center justify-between px-5 py-6">
+            <img src={assets.logo} alt="" className="w-36 cursor-pointer" />
+            <img
+              src={assets.cross_icon}
+              alt=""
+              onClick={() => setShowMenu(false)}
+              className="w-7 cursor-pointer"
+            />
+          </div>
+
+          <ul className="flex flex-col items-center gap-2 mt-2 px-5 text-lg font-medium">
+            <NavLink onClick={() => setShowMenu(false)} to={"/"}>
+              <p className="px-4 py-2 rounded inline-block">HOME</p>
+            </NavLink>
+
+            <NavLink onClick={() => setShowMenu(false)} to={"/doctors"}>
+              <p className="px-4 py-2 rounded inline-block">ALL DOCTORS</p>
+            </NavLink>
+
+            <NavLink onClick={() => setShowMenu(false)} to={"/about"}>
+              <p className="px-4 py-2 rounded inline-block">ABOUT</p>
+            </NavLink>
+
+            <NavLink onClick={() => setShowMenu(false)} to={"/contact"}>
+              <p className="px-4 py-2 rounded inline-block">CONTACT</p>
+            </NavLink>
+          </ul>
+        </div>
       </div>
     </div>
   );
