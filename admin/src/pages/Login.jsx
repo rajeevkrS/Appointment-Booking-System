@@ -8,11 +8,13 @@ const Login = () => {
   const [state, setState] = useState("Admin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setloading] = useState(false);
 
   const { setAdminToken, backendUrl } = useContext(AdminContext);
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
+    setloading(true);
 
     try {
       if (state === "Admin") {
@@ -28,8 +30,14 @@ const Login = () => {
           toast.error(data.message);
         }
       } else {
+        toast.error(data.error);
       }
-    } catch (error) {}
+    } catch (error) {
+      toast.error(error.message);
+      console.log(error);
+    } finally {
+      setloading(false);
+    }
   };
 
   return (
@@ -61,8 +69,14 @@ const Login = () => {
           />
         </div>
 
-        <button className="bg-primary text-white w-full py-2 rounded-md text-base mt-2">
-          Login
+        <button
+          onClick={onSubmitHandler}
+          disabled={loading}
+          className={`bg-primary text-white w-full py-2 rounded-md text-base mt-2 ${
+            loading ? "opacity-50 cursor-not-allowed" : ""
+          }`}
+        >
+          {loading ? "Logging in..." : "Login"}
         </button>
 
         {state === "Admin" ? (

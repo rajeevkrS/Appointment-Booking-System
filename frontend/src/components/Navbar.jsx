@@ -38,7 +38,7 @@ const Navbar = () => {
   return (
     <div
       className="header flex items-center justify-between text-sm p-2 mb-5 border-b border-b-gray-400"
-      ref={navRef} // This should be the correct ref
+      ref={navRef}
     >
       <img
         className="w-40 md:w-44 cursor-pointer"
