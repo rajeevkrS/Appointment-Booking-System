@@ -12,6 +12,7 @@ const AdminContextProvider = ({ children }) => {
 
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
+  // Fetching from API get all doctors list
   const getAllDoctors = async () => {
     try {
       const { data } = await axios.post(
@@ -22,7 +23,29 @@ const AdminContextProvider = ({ children }) => {
 
       if (data.success) {
         setDoctors(data.doctors);
-        console.log(data.doctors);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+      console.log(error);
+    }
+  };
+
+  // Fetching from API for Available Status
+  const changeAvailability = async (docId) => {
+    try {
+      const { data } = await axios.post(
+        backendUrl + "/api/admin/change-availability",
+        { docId },
+        { headers: { adminToken } }
+      );
+
+      if (data.success) {
+        toast.success(data.message);
+
+        // after changing the status then updating the doctors data
+        getAllDoctors();
       } else {
         toast.error(data.message);
       }
@@ -38,6 +61,7 @@ const AdminContextProvider = ({ children }) => {
     backendUrl,
     doctors,
     getAllDoctors,
+    changeAvailability,
   };
 
   return (
