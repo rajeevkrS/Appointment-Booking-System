@@ -1,13 +1,19 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { assets } from "../assets/assets";
 import { NavLink, useNavigate } from "react-router-dom";
+import { AppContext } from "../context/AppContext";
 
 const Navbar = () => {
   const navigate = useNavigate();
   const navRef = useRef(null);
+  const { token, setToken } = useContext(AppContext);
 
   const [showMenu, setShowMenu] = useState(false);
-  const [token, setToken] = useState(true);
+
+  const logout = () => {
+    setToken(false);
+    localStorage.removeItem("token");
+  };
 
   const handleStickyNavbar = () => {
     if (
@@ -89,10 +95,7 @@ const Navbar = () => {
                   My Appointment
                 </p>
 
-                <p
-                  onClick={() => setToken(false)}
-                  className="hover:text-black cursor-pointer"
-                >
+                <p onClick={logout} className="hover:text-black cursor-pointer">
                   Logout
                 </p>
               </div>
@@ -101,7 +104,7 @@ const Navbar = () => {
         ) : (
           <button
             onClick={() => navigate("/login")}
-            className="bg-primary text-white px-6 py-2 rounded-full font-semibold hidden md:block"
+            className="bg-primary text-white px-3 py-2 rounded-full font-semibold"
           >
             Create Account
           </button>
