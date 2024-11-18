@@ -12,6 +12,7 @@ const AppContextProvider = ({ children }) => {
   const [token, setToken] = useState(
     localStorage.getItem("token") ? localStorage.getItem("token") : false
   );
+  const [userData, setUserData] = useState(false);
 
   // Fetching from API for doctors list
   const getDoctorsData = async () => {
@@ -29,9 +30,34 @@ const AppContextProvider = ({ children }) => {
     }
   };
 
+  const getUserProfileData = async () => {
+    try {
+      const { data } = await axios.get(backendUrl + "/api/user/get-profile", {
+        headers: { token },
+      });
+
+      if (data.success) {
+        setUserData(data.userData);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
     getDoctorsData();
   }, []);
+
+  useEffect(() => {
+    if (token) {
+      getUserProfileData();
+    } else {
+      setUserData(false);
+    }
+  }, [token]);
 
   const value = {
     doctors,
@@ -39,6 +65,9 @@ const AppContextProvider = ({ children }) => {
     token,
     setToken,
     backendUrl,
+    userData,
+    setUserData,
+    getUserProfileData,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
