@@ -30,6 +30,7 @@ const AppContextProvider = ({ children }) => {
     }
   };
 
+  // Fetching from API to get user profile data
   const getUserProfileData = async () => {
     try {
       const { data } = await axios.get(backendUrl + "/api/user/get-profile", {
@@ -67,6 +68,7 @@ const AppContextProvider = ({ children }) => {
     backendUrl,
     userData,
     setUserData,
+    getDoctorsData,
     getUserProfileData,
   };
 
