@@ -1,8 +1,60 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { AppContext } from "../context/AppContext";
+import { toast } from "react-toastify";
+import axios from "axios";
 
 const MyAppointments = () => {
-  const { doctors } = useContext(AppContext);
+  const { backendUrl, token } = useContext(AppContext);
+  const [appointments, setAppointments] = useState([]);
+  const months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+
+  const slotDateFormat = (slotDate) => {
+    const dateArray = slotDate.split("_");
+
+    return (
+      dateArray[0] +
+      " " +
+      months[parseInt(dateArray[1], 10) - 1] +
+      " " +
+      dateArray[2]
+    );
+  };
+
+  // Fetching the API to get all appointments of users
+  const getUserAppointments = async () => {
+    try {
+      const { data } = await axios.get(backendUrl + "/api/user/appointments", {
+        headers: { token },
+      });
+
+      if (data.success) {
+        setAppointments(data.appointments.reverse());
+        console.log(data.appointments);
+      }
+    } catch (error) {
+      toast.error(error.message);
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    if (token) {
+      getUserAppointments();
+    }
+  }, [token]);
 
   return (
     <div>
@@ -11,27 +63,33 @@ const MyAppointments = () => {
       </p>
 
       <div>
-        {doctors.slice(0, 3).map((item, index) => (
+        {appointments.slice(0, 3).map((item, index) => (
           <div
             key={index}
             className="grid grid-cols-[1fr_2fr] gap-4 sm:flex sm:gap-6 py-2 border-b"
           >
             <div>
-              <img src={item.image} alt="" className="w-32 bg-indigo-50" />
+              <img
+                src={item.docData.image}
+                alt=""
+                className="w-32 bg-indigo-50"
+              />
             </div>
 
             <div className="flex-1 text-sm text-zinc-600">
-              <p className="text-neutral-800 font-semibold">{item.name}</p>
-              <p>{item.speciality}</p>
+              <p className="text-neutral-800 font-semibold">
+                {item.docData.name}
+              </p>
+              <p>{item.docData.speciality}</p>
               <p className="text-zinc-700 font-medium mt-1">Address:</p>
-              <p className="text-xs">{item.address.line1}</p>
-              <p className="text-xs">{item.address.line2}</p>
+              <p className="text-xs">{item.docData.address.line1}</p>
+              <p className="text-xs">{item.docData.address.line2}</p>
               <p className="text-xs mt-1">
                 <span className="text-sm text-neutral-700 font-medium">
                   Date & Time:
                 </span>
                 <span> </span>
-                25, July, 2024 | 8:30 PM
+                {slotDateFormat(item.slotDate)} | {item.slotTime}
               </p>
             </div>
 
