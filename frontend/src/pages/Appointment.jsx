@@ -236,7 +236,9 @@ const Appointment = () => {
                       <p>{item[0].dateTime.getDate()}</p>
                     </>
                   ) : (
-                    <p className="font-semibold">Fully Booked</p>
+                    <p className="font-semibold">
+                      Fully <br /> Booked
+                    </p>
                   )}
                 </div>
               ))}

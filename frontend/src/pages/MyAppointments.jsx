@@ -4,8 +4,12 @@ import { toast } from "react-toastify";
 import axios from "axios";
 
 const MyAppointments = () => {
-  const { backendUrl, token } = useContext(AppContext);
+  const { backendUrl, token, getDoctorsData } = useContext(AppContext);
   const [appointments, setAppointments] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [cancellingAppointmentId, setCancellingAppointmentId] = useState(null); // Track canceling appointment
+  const [currentPage, setCurrentPage] = useState(1); // For pagination
+  const itemsPerPage = 10; // Number of appointments per page
   const months = [
     "Jan",
     "Feb",
@@ -42,11 +46,38 @@ const MyAppointments = () => {
 
       if (data.success) {
         setAppointments(data.appointments.reverse());
-        console.log(data.appointments);
       }
     } catch (error) {
       toast.error(error.message);
       console.log(error);
+    }
+  };
+
+  // Fetching the API to cancel an appointments of users
+  const cancelAppointment = async (appointmentId) => {
+    try {
+      setLoading(true);
+      setCancellingAppointmentId(appointmentId);
+
+      const { data } = await axios.post(
+        backendUrl + "/api/user/cancel-appointment",
+        { appointmentId },
+        { headers: { token } }
+      );
+
+      if (data.success) {
+        toast.success(data.message);
+        getUserAppointments(); // updating the user's appointments data
+        getDoctorsData(); // updating the doctors data like slot time
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+      console.log(error);
+    } finally {
+      setLoading(false);
+      setCancellingAppointmentId(null);
     }
   };
 
@@ -56,56 +87,111 @@ const MyAppointments = () => {
     }
   }, [token]);
 
+  // Pagination logic
+  const totalPages = Math.ceil(appointments.length / itemsPerPage);
+  const currentAppointments = appointments.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
   return (
     <div>
       <p className="pb-3 mt-12 font-medium text-zinc-700 border-b">
         My appointments
       </p>
 
-      <div>
-        {appointments.slice(0, 3).map((item, index) => (
-          <div
-            key={index}
-            className="grid grid-cols-[1fr_2fr] gap-4 sm:flex sm:gap-6 py-2 border-b"
-          >
-            <div>
-              <img
-                src={item.docData.image}
-                alt=""
-                className="w-32 bg-indigo-50"
-              />
-            </div>
+      {appointments.length === 0 ? (
+        <p className="mt-5 text-center text-zinc-500">
+          No appointments available!
+        </p>
+      ) : (
+        <>
+          <div>
+            {currentAppointments.map((item, index) => (
+              <div
+                key={index}
+                className="grid grid-cols-[1fr_2fr] gap-4 sm:flex sm:gap-6 py-2 border-b"
+              >
+                <div>
+                  <img
+                    src={item.docData.image}
+                    alt=""
+                    className="w-32 bg-indigo-50"
+                  />
+                </div>
+                <div className="flex-1 text-sm text-zinc-600">
+                  <p className="text-neutral-800 font-semibold">
+                    {item.docData.name}
+                  </p>
+                  <p>{item.docData.speciality}</p>
+                  <p className="text-zinc-700 font-medium mt-1">Address:</p>
+                  <p className="text-xs">{item.docData.address.line1}</p>
+                  <p className="text-xs">{item.docData.address.line2}</p>
+                  <p className="text-xs mt-1">
+                    <span className="text-sm text-neutral-700 font-medium">
+                      Date & Time:
+                    </span>
+                    <span> </span>
+                    {slotDateFormat(item.slotDate)} | {item.slotTime}
+                  </p>
+                </div>
+                <div className="flex flex-col gap-2 justify-end">
+                  {!item.cancelled && (
+                    <button className="text-sm text-stone-500 text-center sm:min-w-48 py-2 border rounded hover:bg-primary hover:text-white transition-all duration-300">
+                      Pay Online
+                    </button>
+                  )}
 
-            <div className="flex-1 text-sm text-zinc-600">
-              <p className="text-neutral-800 font-semibold">
-                {item.docData.name}
-              </p>
-              <p>{item.docData.speciality}</p>
-              <p className="text-zinc-700 font-medium mt-1">Address:</p>
-              <p className="text-xs">{item.docData.address.line1}</p>
-              <p className="text-xs">{item.docData.address.line2}</p>
-              <p className="text-xs mt-1">
-                <span className="text-sm text-neutral-700 font-medium">
-                  Date & Time:
-                </span>
-                <span> </span>
-                {slotDateFormat(item.slotDate)} | {item.slotTime}
-              </p>
-            </div>
-
-            <div></div>
-
-            <div className="flex flex-col gap-2 justify-end">
-              <button className="text-sm text-stone-500 text-center sm:min-w-48 py-2 border rounded hover:bg-primary hover:text-white transition-all duration-300">
-                Pay Online
-              </button>
-              <button className="text-sm text-stone-500 text-center sm:min-w-48 py-2 border rounded hover:bg-red-600 hover:text-white transition-all duration-300">
-                Cancel Appointment
-              </button>
-            </div>
+                  {!item.cancelled && (
+                    <button
+                      onClick={() => cancelAppointment(item._id)}
+                      disabled={loading && cancellingAppointmentId === item._id}
+                      className={`text-sm text-center sm:min-w-48 py-2 border rounded transition-all duration-300 ${
+                        loading && cancellingAppointmentId === item._id
+                          ? "bg-gray-400 text-white cursor-not-allowed"
+                          : "hover:bg-red-600 hover:text-white text-stone-500"
+                      }`}
+                    >
+                      {loading && cancellingAppointmentId === item._id
+                        ? "Cancelling..."
+                        : "Cancel Appointment"}
+                    </button>
+                  )}
+                  {item.cancelled && (
+                    <button className="sm:min-w-48 py-2 border border-red-500 rounded text-red-500">
+                      Appointment Cancelled
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
+
+          {/* Pagination Controls - Display only if there are more than 10 appointments */}
+          {appointments.length > 10 && (
+            <div className="flex justify-center mt-4 gap-2">
+              <button
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="px-4 py-2 border rounded disabled:opacity-50"
+              >
+                Previous
+              </button>
+              <span className="px-4 py-2">{`Page ${currentPage} of ${totalPages}`}</span>
+
+              <button
+                onClick={() =>
+                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                }
+                disabled={currentPage === totalPages}
+                className="px-4 py-2 border rounded disabled:opacity-50"
+              >
+                Next
+              </button>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 };
