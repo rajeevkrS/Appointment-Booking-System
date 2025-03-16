@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { AppContext } from "../context/AppContext";
 import { toast } from "react-toastify";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const MyAppointments = () => {
   const { backendUrl, token, getDoctorsData } = useContext(AppContext);
@@ -24,6 +25,8 @@ const MyAppointments = () => {
     "Nov",
     "Dec",
   ];
+  const navigate = useNavigate();
+  const [loadingAppointmentId, setLoadingAppointmentId] = useState(null);
 
   const slotDateFormat = (slotDate) => {
     const dateArray = slotDate.split("_");
@@ -78,6 +81,74 @@ const MyAppointments = () => {
     } finally {
       setLoading(false);
       setCancellingAppointmentId(null);
+    }
+  };
+
+  // Function initializes the Razorpay payment gateway and handles the payment process.
+  const initPay = (order) => {
+    const options = {
+      key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+      amount: order.amount,
+      currency: order.currency,
+      name: "Appointment Payment",
+      description: "Appointment Payment",
+      order_id: order.id,
+      receipt: order.receipt,
+      method: {
+        card: true, // Enable card payments
+        netbanking: false,
+        wallet: false,
+        upi: false,
+        emi: false,
+        paylater: false,
+      },
+      handler: async (response) => {
+        try {
+          const { data } = await axios.post(
+            backendUrl + "/api/user/verifyRazorpay",
+            response,
+            { headers: { token } }
+          );
+
+          if (data.success) {
+            getUserAppointments();
+            navigate("/my-appointments");
+            toast.success("Payment Successful!");
+          }
+        } catch (error) {
+          toast.error(error.message);
+          console.log(error);
+        } finally {
+          setLoading(false);
+          setLoadingAppointmentId(null);
+        }
+      },
+    };
+
+    const rzp = new window.Razorpay(options);
+    rzp.open();
+  };
+
+  // Fetching the API to make the payment using Razorpay
+  const appointmentRazorpay = async (appointmentId) => {
+    try {
+      setLoading(true);
+      setLoadingAppointmentId(appointmentId);
+
+      const { data } = await axios.post(
+        backendUrl + "/api/user/payment-razorpay",
+        { appointmentId },
+        { headers: { token } }
+      );
+
+      if (data.success) {
+        initPay(data.order);
+      }
+    } catch (error) {
+      toast.error(error.message);
+      console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -136,9 +207,25 @@ const MyAppointments = () => {
                   </p>
                 </div>
                 <div className="flex flex-col gap-2 justify-end">
-                  {!item.cancelled && (
-                    <button className="text-sm text-stone-500 text-center sm:min-w-48 py-2 border rounded hover:bg-primary hover:text-white transition-all duration-300">
-                      Pay Online
+                  {!item.cancelled && !item.payment && (
+                    <button
+                      onClick={() => appointmentRazorpay(item._id)}
+                      disabled={loading && loadingAppointmentId === item._id}
+                      className={`text-sm text-stone-500 text-center sm:min-w-48 py-2 border rounded transition-all duration-300 ${
+                        loading && loadingAppointmentId === item._id
+                          ? "bg-gray-400 text-white cursor-not-allowed"
+                          : "hover:bg-primary hover:text-white"
+                      }`}
+                    >
+                      {loading && loadingAppointmentId === item._id
+                        ? "Processing..."
+                        : "Pay Online"}
+                    </button>
+                  )}
+
+                  {!item.cancelled && item.payment && (
+                    <button className="sm:min-w-48 py-2 border text-stone-500 rounded bg-indigo-50">
+                      Paid
                     </button>
                   )}
 
@@ -157,6 +244,7 @@ const MyAppointments = () => {
                         : "Cancel Appointment"}
                     </button>
                   )}
+
                   {item.cancelled && (
                     <button className="sm:min-w-48 py-2 border border-red-500 rounded text-red-500">
                       Appointment Cancelled

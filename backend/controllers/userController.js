@@ -268,7 +268,7 @@ const paymentRazorpay = async (req, res) => {
     // Taking these data from req
     const { appointmentId } = req.body;
 
-    // finding the appointment data using id
+    // finding the appointment data using the provided appointmentId
     const appointmentData = await appointmentModel.findById(appointmentId);
 
     // check if appointment is available or cancelled is true then return
@@ -279,17 +279,45 @@ const paymentRazorpay = async (req, res) => {
       });
     }
 
-    // if not cancelled then displaying Razorpay option
+    // if not cancelled then Preparing Razorpay Order Options
     const options = {
-      amount: appointmentData.amount * 100,
+      amount: appointmentData.amount * 100, // amount in paise
       currency: process.env.CURRENCY,
-      receipt: appointmentId,
+      receipt: appointmentId, // using the appointmentId as a unique identifier
     };
 
-    // creation of an order
+    // Creating a Razorpay Order
+    // "razorpayInstance.orders.create(options)" sends the options to Razorpay's API to create a payment order
+    // If successful, it returns an order object that includes details like the order ID, amount, currency, etc
     const order = await razorpayInstance.orders.create(options);
 
     res.json({ success: true, order });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+};
+
+// API to verify payment of Razorpay
+const verifyRazorpay = async (req, res) => {
+  try {
+    // Extract the Razorpay order ID from the request body
+    const { razorpay_order_id } = req.body;
+
+    // Fetch the order information from Razorpay using the order ID
+    const orderInfo = await razorpayInstance.orders.fetch(razorpay_order_id);
+
+    // Check if the payment status is 'paid' then
+    if (orderInfo.status === "paid") {
+      // Update the corresponding appointment as 'paid' in the db
+      await appointmentModel.findByIdAndUpdate(orderInfo.receipt, {
+        payment: true, // Mark payment as True(Completed)
+      });
+
+      res.json({ success: true, message: "Payment Successful!" });
+    } else {
+      res.json({ success: false, message: "Payment failed!" });
+    }
   } catch (error) {
     console.log(error);
     res.json({ success: false, message: error.message });
@@ -305,4 +333,5 @@ export {
   getAppointment,
   cancelAppointment,
   paymentRazorpay,
+  verifyRazorpay,
 };
