@@ -10,6 +10,7 @@ const AdminContextProvider = ({ children }) => {
   );
   const [doctors, setDoctors] = useState([]);
   const [appointments, setAppointments] = useState([]);
+  const [dashData, setDashData] = useState(false);
 
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
@@ -97,6 +98,24 @@ const AdminContextProvider = ({ children }) => {
     }
   };
 
+  // Fetching from API to get dashboard data for admin panel
+  const getDashData = async () => {
+    try {
+      const { data } = await axios.get(backendUrl + "/api/admin/dashboard", {
+        headers: { adminToken },
+      });
+
+      if (data.success) {
+        setDashData(data.dashData);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+      console.log(error);
+    }
+  };
+
   const value = {
     adminToken,
     setAdminToken,
@@ -108,6 +127,8 @@ const AdminContextProvider = ({ children }) => {
     setAppointments,
     getAllAppointments,
     appointmentCancel,
+    dashData,
+    getDashData,
   };
 
   return (
