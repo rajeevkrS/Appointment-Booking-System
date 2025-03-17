@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { AdminContext } from "../../context/AdminContext";
 import { AppContext } from "../../context/AppContext";
 import { assets } from "../../assets/assets";
@@ -7,6 +7,7 @@ const AllAppointments = () => {
   const { adminToken, appointments, getAllAppointments, appointmentCancel } =
     useContext(AdminContext);
   const { calculateAge, slotDateFormat, currency } = useContext(AppContext);
+  const [loading, setLoading] = useState(null);
 
   // Fetching all appointments when the component loads
   useEffect(() => {
@@ -14,6 +15,15 @@ const AllAppointments = () => {
       getAllAppointments();
     }
   }, [adminToken]);
+
+  // Handle Cancel Appointment
+  const handleCancel = async (appointmentId) => {
+    setLoading(appointmentId); // Set loading state
+
+    await appointmentCancel(appointmentId); // Call API
+
+    setLoading(null); // Reset loading state
+  };
 
   return (
     <div className="w-full max-w-6xl m-5">
@@ -73,9 +83,16 @@ const AllAppointments = () => {
 
               {item.cancelled ? (
                 <p className="text-red-400 text-xs font-medium">Cancelled</p>
+              ) : loading === item._id ? (
+                <div className="relative w-6 h-6 animate-spin">
+                  <div className="absolute w-2 h-2 bg-gray-500 rounded-full top-0 left-0"></div>
+                  <div className="absolute w-2 h-2 bg-gray-500 rounded-full top-0 right-0"></div>
+                  <div className="absolute w-2 h-2 bg-gray-500 rounded-full bottom-0 left-0"></div>
+                  <div className="absolute w-2 h-2 bg-gray-500 rounded-full bottom-0 right-0"></div>
+                </div>
               ) : (
                 <img
-                  onClick={() => appointmentCancel(item._id)}
+                  onClick={() => handleCancel(item._id)}
                   src={assets.cancel_icon}
                   alt=""
                   className="w-10 cursor-pointer"
