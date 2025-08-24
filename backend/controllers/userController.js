@@ -86,7 +86,7 @@ const loginUser = async (req, res) => {
 const getProfile = async (req, res) => {
   try {
     // get the user id from the req.body(handled in authUser.js)
-    const { userId } = req.body;
+    const userId = req.user.id;
 
     // find the user using id
     const userData = await userModel.findById(userId).select("-password");
@@ -139,7 +139,8 @@ const updateProfile = async (req, res) => {
 const bookAppointment = async (req, res) => {
   try {
     // Taking these data from req
-    const { userId, docId, slotDate, slotTime } = req.body;
+    const { docId, slotDate, slotTime } = req.body;
+    const userId = req.user.id;
 
     // finding the doctor data using id
     const docData = await doctorModel.findById(docId).select("-password");
@@ -205,7 +206,7 @@ const bookAppointment = async (req, res) => {
 const getAppointment = async (req, res) => {
   try {
     // Taking userId from req
-    const { userId } = req.body;
+    const userId = req.user.id;
 
     const appointments = await appointmentModel.find({ userId });
 
@@ -220,7 +221,8 @@ const getAppointment = async (req, res) => {
 const cancelAppointment = async (req, res) => {
   try {
     // Taking these data from req
-    const { userId, appointmentId } = req.body;
+    const { appointmentId } = req.body;
+    const userId = req.user.id;
 
     // finding the appointment data using id
     const appointmentData = await appointmentModel.findById(appointmentId);

@@ -30,7 +30,7 @@ const AdminContextProvider = ({ children }) => {
       }
     } catch (error) {
       toast.error(error.message);
-      console.log(error);
+      // console.log(error);
     }
   };
 
@@ -53,7 +53,7 @@ const AdminContextProvider = ({ children }) => {
       }
     } catch (error) {
       toast.error(error.message);
-      console.log(error);
+      // console.log(error);
     }
   };
 
@@ -71,7 +71,7 @@ const AdminContextProvider = ({ children }) => {
       }
     } catch (error) {
       toast.error(error.message);
-      console.log(error);
+      // console.log(error);
     }
   };
 
@@ -94,7 +94,7 @@ const AdminContextProvider = ({ children }) => {
       }
     } catch (error) {
       toast.error(error.message);
-      console.log;
+      // console.log(error);
     }
   };
 
