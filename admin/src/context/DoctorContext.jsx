@@ -8,8 +8,9 @@ export const DoctorContext = createContext();
 const DoctorContextProvider = ({ children }) => {
   const backendURL = import.meta.env.VITE_BACKEND_URL;
 
+  // State to store drToken from localStorage if present else empty string
   const [drToken, setDrToken] = useState(
-    localStorage.getItem("dToken") ? localStorage.getItem("dToken") : ""
+    localStorage.getItem("drToken") ? localStorage.getItem("drToken") : ""
   );
 
   const [appointments, setAppointments] = useState([]);
