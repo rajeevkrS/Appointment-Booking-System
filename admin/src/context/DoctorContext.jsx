@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { createContext } from "react";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 export const DoctorContext = createContext();
 
@@ -10,10 +12,38 @@ const DoctorContextProvider = ({ children }) => {
     localStorage.getItem("dToken") ? localStorage.getItem("dToken") : ""
   );
 
+  const [appointments, setAppointments] = useState([]);
+
+  const getAppointments = async () => {
+    try {
+      // API call to get appointments for doctor panel
+      const { data } = await axios.get(
+        backendURL + "/api/doctor/appointments",
+        {
+          headers: { drToken },
+        }
+      );
+
+      // if success true then set appointments in state in reverse order to show latest appointment first
+      if (data.success) {
+        setAppointments(data.appointments);
+        console.log(data.appointments);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(error.message);
+    }
+  };
+
   const value = {
     backendURL,
     drToken,
     setDrToken,
+    appointments,
+    setAppointments,
+    getAppointments,
   };
 
   return (
