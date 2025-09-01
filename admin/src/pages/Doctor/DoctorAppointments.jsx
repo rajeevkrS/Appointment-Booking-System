@@ -4,7 +4,14 @@ import { AppContext } from "../../context/AppContext";
 import { assets } from "../../assets/assets";
 
 const DoctorAppointments = () => {
-  const { drToken, appointments, getAppointments } = useContext(DoctorContext);
+  const {
+    drToken,
+    appointments,
+    getAppointments,
+    completeAppointment,
+    cancelAppointment,
+  } = useContext(DoctorContext);
+
   const { calculateAge, slotDateFormat, currency } = useContext(AppContext);
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -20,7 +27,10 @@ const DoctorAppointments = () => {
   // Pagination logic
   const totalPages = Math.ceil(appointments.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentAppointments = appointments.slice(
+  // Reverse or sort first, then paginate
+  const sortedAppointments = [...appointments].reverse();
+
+  const currentAppointments = sortedAppointments.slice(
     startIndex,
     startIndex + itemsPerPage
   );
@@ -70,18 +80,29 @@ const DoctorAppointments = () => {
               {currency} {item.amount}
             </p>
 
-            <div className="flex">
-              <img
-                src={assets.cancel_icon}
-                className="w-10 cursor-pointer"
-                alt=""
-              />
-              <img
-                src={assets.tick_icon}
-                className="w-10 cursor-pointer"
-                alt=""
-              />
-            </div>
+            {/* if appointment gets cancelled then displaying Cancelled text if not cancelled then checking completed or not, if completed then displaying Completed text if not then displaying buttons img */}
+            {item.cancelled ? (
+              <p className="text-red-400 text-xs font-medium">Cancelled</p>
+            ) : item.isCompleted ? (
+              <p className="text-green-500 text-xs font-medium">Completed</p>
+            ) : (
+              <div className="flex">
+                <img
+                  // cancelAppointment function called on click of cancel icon
+                  onClick={() => cancelAppointment(item._id)}
+                  src={assets.cancel_icon}
+                  className="w-10 cursor-pointer"
+                  alt=""
+                />
+                <img
+                  // completeAppointment function called on click of tick icon
+                  onClick={() => completeAppointment(item._id)}
+                  src={assets.tick_icon}
+                  className="w-10 cursor-pointer"
+                  alt=""
+                />
+              </div>
+            )}
           </div>
         ))}
       </div>

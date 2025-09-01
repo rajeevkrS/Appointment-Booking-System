@@ -92,7 +92,7 @@ const appointmentComplete = async (req, res) => {
     const appointmentData = await appointmentModel.findById(appointmentId);
 
     // checking appointment is present or not and appointment is of same doctor or not before updating status to completed
-    if (appointmentData && appointmentData.doctId === docId) {
+    if (appointmentData && appointmentData.docId === docId) {
       // marking appointment as completed by setting cancelled field to true
       await appointmentModel.findByIdAndUpdate(appointmentId, {
         isCompleted: true,
@@ -119,7 +119,7 @@ const appointmentCancel = async (req, res) => {
     const appointmentData = await appointmentModel.findById(appointmentId);
 
     // if appointment is present and appointment is of same doctor then only updating cancelled status to true
-    if (appointmentData && appointmentData.doctId === docId) {
+    if (appointmentData && appointmentData.docId === docId) {
       // marking cancelled true if appointment is cancelled by doctor
       await appointmentModel.findByIdAndUpdate(appointmentId, {
         cancelled: true,

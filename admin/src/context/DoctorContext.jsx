@@ -38,6 +38,50 @@ const DoctorContextProvider = ({ children }) => {
     }
   };
 
+  // Function to mark appointment as completed
+  const completeAppointment = async (appointmentId) => {
+    try {
+      const { data } = await axios.post(
+        backendURL + "/api/doctor/complete-appointment",
+        { appointmentId },
+        { headers: { drToken } }
+      );
+
+      if (data.success) {
+        toast.success(data.message);
+        // calling getAppointments function to get all updated appointments
+        getAppointments();
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(error.message);
+    }
+  };
+
+  // Function to mark appointment as Cancelled
+  const cancelAppointment = async (appointmentId) => {
+    try {
+      const { data } = await axios.post(
+        backendURL + "/api/doctor/cancel-appointment",
+        { appointmentId },
+        { headers: { drToken } }
+      );
+
+      if (data.success) {
+        toast.success(data.message);
+        // calling getAppointments function to get all updated appointments
+        getAppointments();
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(error.message);
+    }
+  };
+
   const value = {
     backendURL,
     drToken,
@@ -45,6 +89,8 @@ const DoctorContextProvider = ({ children }) => {
     appointments,
     setAppointments,
     getAppointments,
+    completeAppointment,
+    cancelAppointment,
   };
 
   return (
