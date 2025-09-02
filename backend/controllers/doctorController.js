@@ -134,6 +134,47 @@ const appointmentCancel = async (req, res) => {
   }
 };
 
+// API to get dashboard data for doctor panel
+const doctorDashboard = async (req, res) => {
+  try {
+    // doctor id from authDoctor middleware
+    const docId = req.doctor.id;
+
+    // finding all appointments of particular doctor using docId
+    const appointments = await appointmentModel.find({ docId });
+
+    let earnings = 0;
+    // calculating total earnings of doctor from all completed appointments
+    appointments.map((item) => {
+      // checking if appointment is completed or payment is done then only adding amount to earnings
+      if (item.isCompleted || item.payment) {
+        earnings += item.amount;
+      }
+    });
+
+    let patients = [];
+    // getting unique patients from all appointments of doctor
+    appointments.map((item) => {
+      // checking if userId is already present in patients array or not if not then pushing userId to patients array
+      if (!patients.includes(item.userId)) {
+        patients.push(item.userId);
+      }
+    });
+
+    const dashData = {
+      appointments: appointments.length,
+      earnings,
+      patients: patients.length,
+      lastestAppointments: appointments.slice(-5).reverse(), // getting last 5 appointments
+    };
+
+    res.json({ success: true, dashData });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+};
+
 export {
   changeAvailability,
   doctorList,
@@ -141,4 +182,5 @@ export {
   appointmentsDoctor,
   appointmentComplete,
   appointmentCancel,
+  doctorDashboard,
 };
