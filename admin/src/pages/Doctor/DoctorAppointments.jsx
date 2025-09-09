@@ -15,6 +15,7 @@ const DoctorAppointments = () => {
   const { calculateAge, slotDateFormat, currency } = useContext(AppContext);
 
   const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(null);
   const itemsPerPage = 10;
 
   // fetch appointments when doctor is logged in
@@ -23,6 +24,22 @@ const DoctorAppointments = () => {
       getAppointments();
     }
   }, [drToken]);
+
+  // handle cancel
+  const handleCancel = async (appointmentId) => {
+    setLoading(appointmentId);
+    await cancelAppointment(appointmentId);
+    await getAppointments();
+    setLoading(null);
+  };
+
+  // handle complete
+  const handleComplete = async (appointmentId) => {
+    setLoading(appointmentId);
+    await completeAppointment(appointmentId);
+    await getAppointments();
+    setLoading(null);
+  };
 
   // Pagination logic
   const totalPages = Math.ceil(appointments.length / itemsPerPage);
@@ -85,18 +102,23 @@ const DoctorAppointments = () => {
               <p className="text-red-400 text-xs font-medium">Cancelled</p>
             ) : item.isCompleted ? (
               <p className="text-green-500 text-xs font-medium">Completed</p>
+            ) : loading === item._id ? (
+              <div className="relative w-6 h-6 animate-spin">
+                <div className="absolute w-2 h-2 bg-gray-500 rounded-full top-0 left-0"></div>
+                <div className="absolute w-2 h-2 bg-gray-500 rounded-full top-0 right-0"></div>
+                <div className="absolute w-2 h-2 bg-gray-500 rounded-full bottom-0 left-0"></div>
+                <div className="absolute w-2 h-2 bg-gray-500 rounded-full bottom-0 right-0"></div>
+              </div>
             ) : (
               <div className="flex">
                 <img
-                  // cancelAppointment function called on click of cancel icon
-                  onClick={() => cancelAppointment(item._id)}
+                  onClick={() => handleCancel(item._id)}
                   src={assets.cancel_icon}
                   className="w-10 cursor-pointer"
                   alt=""
                 />
                 <img
-                  // completeAppointment function called on click of tick icon
-                  onClick={() => completeAppointment(item._id)}
+                  onClick={() => handleComplete(item._id)}
                   src={assets.tick_icon}
                   className="w-10 cursor-pointer"
                   alt=""

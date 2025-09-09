@@ -14,7 +14,9 @@ const DoctorContextProvider = ({ children }) => {
   );
 
   const [appointments, setAppointments] = useState([]);
+  const [dashData, setDashData] = useState(false);
 
+  // Function to get all appointments for doctor panel
   const getAppointments = async () => {
     try {
       // API call to get appointments for doctor panel
@@ -51,6 +53,7 @@ const DoctorContextProvider = ({ children }) => {
         toast.success(data.message);
         // calling getAppointments function to get all updated appointments
         getAppointments();
+        getDashData();
       } else {
         toast.error(data.message);
       }
@@ -73,6 +76,26 @@ const DoctorContextProvider = ({ children }) => {
         toast.success(data.message);
         // calling getAppointments function to get all updated appointments
         getAppointments();
+        getDashData();
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(error.message);
+    }
+  };
+
+  // Function to get dashboard data for doctor panel
+  const getDashData = async () => {
+    try {
+      const { data } = await axios.get(backendURL + "/api/doctor/dashboard", {
+        headers: { drToken },
+      });
+
+      if (data.success) {
+        setDashData(data.dashData);
+        console.log(data.dashData);
       } else {
         toast.error(data.message);
       }
@@ -91,6 +114,9 @@ const DoctorContextProvider = ({ children }) => {
     getAppointments,
     completeAppointment,
     cancelAppointment,
+    dashData,
+    setDashData,
+    getDashData,
   };
 
   return (
