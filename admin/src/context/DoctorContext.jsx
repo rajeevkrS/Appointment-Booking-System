@@ -15,6 +15,7 @@ const DoctorContextProvider = ({ children }) => {
 
   const [appointments, setAppointments] = useState([]);
   const [dashData, setDashData] = useState(false);
+  const [profileData, setProfileData] = useState(false);
 
   // Function to get all appointments for doctor panel
   const getAppointments = async () => {
@@ -105,6 +106,23 @@ const DoctorContextProvider = ({ children }) => {
     }
   };
 
+  // Function to get profile data for doctor panel
+  const getProfileData = async () => {
+    try {
+      const { data } = await axios.get(backendURL + "/api/doctor/profile", {
+        headers: { drToken },
+      });
+
+      if (data.success) {
+        setProfileData(data.profileData);
+        console.log(data.profileData);
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(error.message);
+    }
+  };
+
   const value = {
     backendURL,
     drToken,
@@ -117,6 +135,9 @@ const DoctorContextProvider = ({ children }) => {
     dashData,
     setDashData,
     getDashData,
+    profileData,
+    setProfileData,
+    getProfileData,
   };
 
   return (
