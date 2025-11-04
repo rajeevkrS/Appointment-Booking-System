@@ -198,10 +198,10 @@ const updateDoctorProfile = async (req, res) => {
     const docId = req.doctor.id;
 
     // getting updated data from req.body
-    const { fees, address, available } = req.body;
+    const { fee, address, available } = req.body;
 
     // updating doctor profile using docId
-    await doctorModel.findByIdAndUpdate(docId, { fees, address, available });
+    await doctorModel.findByIdAndUpdate(docId, { fee, address, available });
 
     res.json({ success: true, message: "Profile Updated!" });
   } catch (error) {
