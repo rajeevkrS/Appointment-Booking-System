@@ -103,6 +103,8 @@ const AllAppointments = () => {
                 <div className="absolute w-2 h-2 bg-gray-500 rounded-full bottom-0 left-0"></div>
                 <div className="absolute w-2 h-2 bg-gray-500 rounded-full bottom-0 right-0"></div>
               </div>
+            ) : item.isCompleted ? (
+              <p className="text-green-500 text-xs font-medium">Completed</p>
             ) : (
               <img
                 onClick={() => handleCancel(item._id)}

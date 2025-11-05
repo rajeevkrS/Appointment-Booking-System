@@ -3,9 +3,11 @@ import { assets } from "../assets/assets";
 import { AdminContext } from "../context/AdminContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { DoctorContext } from "../context/DoctorContext";
 
 const Navbar = () => {
   const { adminToken, setAdminToken } = useContext(AdminContext);
+  const { drToken, setDrToken } = useContext(DoctorContext);
   const [loading, setLoading] = useState(false);
   const navRef = useRef(null);
 
@@ -17,6 +19,10 @@ const Navbar = () => {
       // Clear admin token
       adminToken && setAdminToken("");
       adminToken && localStorage.removeItem("aToken");
+
+      // Clear doctor token
+      drToken && setDrToken("");
+      drToken && localStorage.removeItem("drToken");
 
       // Display toast message
       toast.success("Logout successful!");
