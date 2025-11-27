@@ -14,15 +14,8 @@ const AdminContextProvider = ({ children }) => {
 
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
-  // Loading states
-  const [loadingDoctors, setLoadingDoctors] = useState(false);
-  const [loadingAppointments, setLoadingAppointments] = useState(false);
-  const [loadingDash, setLoadingDash] = useState(false);
-
   // Fetching from API get all doctors list
   const getAllDoctors = async () => {
-    setLoadingDoctors(true);
-
     try {
       const { data } = await axios.post(
         backendUrl + "/api/admin/all-doctors",
@@ -37,9 +30,7 @@ const AdminContextProvider = ({ children }) => {
       }
     } catch (error) {
       toast.error(error.message);
-      console.log(error);
-    } finally {
-      setLoadingDoctors(false);
+      // console.log(error);
     }
   };
 
@@ -62,14 +53,12 @@ const AdminContextProvider = ({ children }) => {
       }
     } catch (error) {
       toast.error(error.message);
-      console.log(error);
+      // console.log(error);
     }
   };
 
   // Fetching from API to get all appointments list
   const getAllAppointments = async () => {
-    setLoadingAppointments(true);
-
     try {
       const { data } = await axios.get(backendUrl + "/api/admin/appointments", {
         headers: { adminToken },
@@ -82,9 +71,7 @@ const AdminContextProvider = ({ children }) => {
       }
     } catch (error) {
       toast.error(error.message);
-      console.log(error);
-    } finally {
-      setLoadingAppointments(false);
+      // console.log(error);
     }
   };
 
@@ -107,14 +94,12 @@ const AdminContextProvider = ({ children }) => {
       }
     } catch (error) {
       toast.error(error.message);
-      console.log(error);
+      // console.log(error);
     }
   };
 
   // Fetching from API to get dashboard data for admin panel
   const getDashData = async () => {
-    setLoadingDash(true);
-
     try {
       const { data } = await axios.get(backendUrl + "/api/admin/dashboard", {
         headers: { adminToken },
@@ -128,8 +113,6 @@ const AdminContextProvider = ({ children }) => {
     } catch (error) {
       toast.error(error.message);
       console.log(error);
-    } finally {
-      setLoadingDash(false);
     }
   };
 
@@ -146,9 +129,6 @@ const AdminContextProvider = ({ children }) => {
     appointmentCancel,
     dashData,
     getDashData,
-    loadingDoctors,
-    loadingAppointments,
-    loadingDash,
   };
 
   return (

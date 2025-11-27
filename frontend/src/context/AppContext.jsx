@@ -13,14 +13,16 @@ const AppContextProvider = ({ children }) => {
     localStorage.getItem("token") ? localStorage.getItem("token") : false
   );
   const [userData, setUserData] = useState(false);
-  const [loadingUser, setLoadingUser] = useState(true);
-  const [doctorsLoading, setDoctorsLoading] = useState(true);
+
+  // Loading states
+  const [loadingUser, setLoadingUser] = useState(false);
+  const [doctorsLoading, setDoctorsLoading] = useState(false);
 
   // Fetching from API for doctors list
   const getDoctorsData = async () => {
-    try {
-      setDoctorsLoading(true);
+    setDoctorsLoading(true);
 
+    try {
       const { data } = await axios.get(backendUrl + "/api/doctor/list");
 
       if (data.success) {

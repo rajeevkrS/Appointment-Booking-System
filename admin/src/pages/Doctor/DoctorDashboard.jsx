@@ -11,7 +11,6 @@ const DoctorDashboard = () => {
     getDashData,
     completeAppointment,
     cancelAppointment,
-    loadingDash,
   } = useContext(DoctorContext);
   const { currency, slotDateFormat } = useContext(AppContext);
   const [loading, setLoading] = useState(null);
@@ -22,13 +21,6 @@ const DoctorDashboard = () => {
       getDashData();
     }
   }, [drToken]);
-
-  // Show loading state
-  if (loadingDash) {
-    return (
-      <p className="m-5 text-center text-gray-500">Loading dashboard...</p>
-    );
-  }
 
   // Handle Complete Appointment
   const handleComplete = async (appointmentId) => {

@@ -17,14 +17,8 @@ const DoctorContextProvider = ({ children }) => {
   const [dashData, setDashData] = useState(false);
   const [profileData, setProfileData] = useState(false);
 
-  // Loading states
-  const [loadingAppointments, setLoadingAppointments] = useState(false);
-  const [loadingDash, setLoadingDash] = useState(false);
-
   // Function to get all appointments for doctor panel
   const getAppointments = async () => {
-    setLoadingAppointments(true);
-
     try {
       // API call to get appointments for doctor panel
       const { data } = await axios.get(
@@ -44,8 +38,6 @@ const DoctorContextProvider = ({ children }) => {
     } catch (error) {
       console.log(error);
       toast.error(error.message);
-    } finally {
-      setLoadingAppointments(false);
     }
   };
 
@@ -97,8 +89,6 @@ const DoctorContextProvider = ({ children }) => {
 
   // Function to get dashboard data for doctor panel
   const getDashData = async () => {
-    setLoadingDash(true);
-
     try {
       const { data } = await axios.get(backendURL + "/api/doctor/dashboard", {
         headers: { drToken },
@@ -113,8 +103,6 @@ const DoctorContextProvider = ({ children }) => {
     } catch (error) {
       console.log(error);
       toast.error(error.message);
-    } finally {
-      setLoadingDash(false);
     }
   };
 
@@ -150,8 +138,6 @@ const DoctorContextProvider = ({ children }) => {
     profileData,
     setProfileData,
     getProfileData,
-    loadingAppointments,
-    loadingDash,
   };
 
   return (

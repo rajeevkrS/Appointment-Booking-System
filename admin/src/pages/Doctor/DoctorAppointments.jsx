@@ -10,7 +10,6 @@ const DoctorAppointments = () => {
     getAppointments,
     completeAppointment,
     cancelAppointment,
-    loadingAppointments,
   } = useContext(DoctorContext);
 
   const { calculateAge, slotDateFormat, currency } = useContext(AppContext);
@@ -25,13 +24,6 @@ const DoctorAppointments = () => {
       getAppointments();
     }
   }, [drToken]);
-
-  // Show loading state
-  if (loadingAppointments) {
-    return (
-      <p className="m-5 text-center text-gray-500">Loading appointments...</p>
-    );
-  }
 
   // handle cancel
   const handleCancel = async (appointmentId) => {

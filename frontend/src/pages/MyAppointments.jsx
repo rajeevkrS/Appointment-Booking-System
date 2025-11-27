@@ -43,7 +43,6 @@ const MyAppointments = () => {
   // Fetching the API to get all appointments of users
   const getUserAppointments = async () => {
     try {
-      setLoading(true);
       const { data } = await axios.get(backendUrl + "/api/user/appointments", {
         headers: { token },
       });
@@ -54,8 +53,6 @@ const MyAppointments = () => {
     } catch (error) {
       toast.error(error.message);
       console.log(error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -174,11 +171,7 @@ const MyAppointments = () => {
         My appointments
       </p>
 
-      {loading ? (
-        <p className="mt-5 text-center text-zinc-500">
-          Loading appointments...
-        </p>
-      ) : appointments.length === 0 ? (
+      {appointments.length === 0 ? (
         <p className="mt-5 text-center text-zinc-500">
           No appointments available!
         </p>

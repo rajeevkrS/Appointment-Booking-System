@@ -4,7 +4,7 @@ import { assets } from "../../assets/assets";
 import { AppContext } from "../../context/AppContext";
 
 const Dashboard = () => {
-  const { adminToken, dashData, getDashData, appointmentCancel, loadingDash } =
+  const { adminToken, dashData, getDashData, appointmentCancel } =
     useContext(AdminContext);
   const { slotDateFormat } = useContext(AppContext);
   const [loading, setLoading] = useState(null);
@@ -15,35 +15,6 @@ const Dashboard = () => {
       getDashData();
     }
   }, [adminToken]);
-
-  // Show loading state
-  if (loadingDash) {
-    return (
-      <p className="m-5 text-center text-gray-500">Loading dashboard...</p>
-    );
-  }
-
-  // Another way to show loading state
-  // if (loadingDash) {
-  //   return (
-  //     <div className="m-5">
-  //       <div className="flex gap-3">
-  //         <div className="w-32 h-20 bg-gray-200 animate-pulse rounded"></div>
-  //         <div className="w-32 h-20 bg-gray-200 animate-pulse rounded"></div>
-  //         <div className="w-32 h-20 bg-gray-200 animate-pulse rounded"></div>
-  //       </div>
-
-  //       <div className="mt-10">
-  //         {[...Array(5)].map((_, i) => (
-  //           <div
-  //             key={i}
-  //             className="h-12 bg-gray-200 my-2 rounded animate-pulse"
-  //           ></div>
-  //         ))}
-  //       </div>
-  //     </div>
-  //   );
-  // }
 
   // Handle Cancel Appointment
   const handleCancel = async (appointmentId) => {
