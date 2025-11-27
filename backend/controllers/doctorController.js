@@ -68,7 +68,8 @@ const loginDoctor = async (req, res) => {
 // API to get doctor appointments for doctor panel
 const appointmentsDoctor = async (req, res) => {
   try {
-    const docId = req.doctor.id;
+    const { docId } = req.body;
+    //const docId = req.doctor.id;
 
     // finding appointments of particular doctor using docId
     const appointments = await appointmentModel.find({ docId });
@@ -84,7 +85,8 @@ const appointmentsDoctor = async (req, res) => {
 const appointmentComplete = async (req, res) => {
   try {
     // doctor id from authDoctor middleware
-    const docId = req.doctor.id;
+    const { docId } = req.body;
+    // const docId = req.doctor.id;
 
     const { appointmentId } = req.body;
 
@@ -111,9 +113,9 @@ const appointmentComplete = async (req, res) => {
 const appointmentCancel = async (req, res) => {
   try {
     // doctor id from authDoctor middleware
-    const docId = req.doctor.id;
+    // const docId = req.doctor.id;
 
-    const { appointmentId } = req.body;
+    const { docId, appointmentId } = req.body;
 
     // finding appointment using appointmentId and docId and updating status to completed
     const appointmentData = await appointmentModel.findById(appointmentId);
@@ -138,7 +140,8 @@ const appointmentCancel = async (req, res) => {
 const doctorDashboard = async (req, res) => {
   try {
     // doctor id from authDoctor middleware
-    const docId = req.doctor.id;
+    const { docId } = req.body;
+    //const docId = req.doctor.id;
 
     // finding all appointments of particular doctor using docId
     const appointments = await appointmentModel.find({ docId });
@@ -179,7 +182,8 @@ const doctorDashboard = async (req, res) => {
 const doctorProfile = async (req, res) => {
   try {
     // doctor id from authDoctor middleware
-    const docId = req.doctor.id;
+    const { docId } = req.body;
+    // const docId = req.doctor.id;
 
     // finding doctor profile using docId
     const profileData = await doctorModel.findById(docId).select("-password");
@@ -195,7 +199,8 @@ const doctorProfile = async (req, res) => {
 const updateDoctorProfile = async (req, res) => {
   try {
     // doctor id from authDoctor middleware
-    const docId = req.doctor.id;
+    const { docId } = req.body;
+    // const docId = req.doctor.id;
 
     // getting updated data from req.body
     const { fee, address, available } = req.body;

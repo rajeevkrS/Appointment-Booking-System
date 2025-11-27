@@ -17,7 +17,8 @@ const authDoctor = async (req, res, next) => {
     const drtoken_decode = jwt.verify(drtoken, process.env.JWT_SECRET);
 
     // got the doctor id from the drtoken and it will be added in the req.body
-    req.doctor = { id: drtoken_decode.id };
+    req.body.docId = drtoken_decode.id;
+    // req.doctor = { id: drtoken_decode.id };
 
     // Call the next middleware or route handler
     next();
