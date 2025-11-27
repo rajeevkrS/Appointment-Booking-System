@@ -6,7 +6,7 @@ import { AppContext } from "../context/AppContext";
 const Navbar = () => {
   const navigate = useNavigate();
   const navRef = useRef(null);
-  const { token, setToken, userData } = useContext(AppContext);
+  const { token, setToken, userData, loadingUser } = useContext(AppContext);
 
   const [showMenu, setShowMenu] = useState(false);
 
@@ -53,6 +53,8 @@ const Navbar = () => {
         alt=""
         onClick={() => navigate("/")}
       />
+
+      {/* ---------- LINKS ---------- */}
       <ul className="hidden md:flex items-start gap-5 font-medium">
         <NavLink to={"/"}>
           <li className="py-1">HOME</li>
@@ -75,8 +77,13 @@ const Navbar = () => {
         </NavLink>
       </ul>
 
+      {/* ---------- RIGHT SIDE ---------- */}
       <div className="flex items-center gap-4">
-        {token && userData ? (
+        {loadingUser ? (
+          // Skeleton (prevents flicker)
+          <div className="w-24 h-8 bg-gray-200 rounded-full animate-pulse"></div>
+        ) : token && userData ? (
+          // Logged-in UI
           <div className="flex items-center gap-2 cursor-pointer group relative">
             <img className="w-8 rounded-full" src={userData.image} alt="" />
             <img className="w-2.5" src={assets.dropdown_icon} alt="" />
@@ -103,6 +110,7 @@ const Navbar = () => {
             </div>
           </div>
         ) : (
+          // Logged-out UI
           <button
             onClick={() => navigate("/login")}
             className="bg-primary text-white px-3 py-2 rounded-full font-semibold"

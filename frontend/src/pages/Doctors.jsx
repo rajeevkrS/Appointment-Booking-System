@@ -8,7 +8,7 @@ const Doctors = () => {
   const [showFilter, setShowFilter] = useState(false);
   const navigate = useNavigate();
 
-  const { doctors } = useContext(AppContext);
+  const { doctors, doctorsLoading } = useContext(AppContext);
 
   const applyFilter = () => {
     if (speciality) {
@@ -118,36 +118,65 @@ const Doctors = () => {
         </div>
 
         <div className="w-full grid grid-cols-auto gap-4 gap-y-6">
-          {filterDoc.map((item, index) => (
-            <div
-              key={index}
-              className="border border-blue-200 rounded-xl overflow-hidden cursor-pointer hover:translate-y-[-10px] transition-all duration-500"
-              onClick={() => {
-                navigate(`/appointment/${item._id}`);
-                scrollTo(0, 0);
-              }}
-            >
-              <img src={item.image} alt="" className="bg-blue-50" />
-              <div className="p-4">
+          {doctorsLoading ? (
+            Array(12)
+              .fill(0)
+              .map((_, i) => (
                 <div
-                  className={`flex items-center gap-2 text-sm text-center ${
-                    item.available ? "text-green-500" : "text-gray-500"
-                  }`}
+                  key={i}
+                  className="border border-blue-200 rounded-xl overflow-hidden animate-pulse"
                 >
-                  <p
-                    className={`w-2 h-2 ${
-                      item.available ? "bg-green-500" : "bg-gray-500"
-                    }  rounded-full`}
-                  ></p>
-                  <p>{item.available ? "Available" : "Not Available"}</p>
+                  <div className="bg-blue-100 h-40 w-full"></div>
+
+                  <div className="p-4 space-y-3">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
+                      <div className="h-3 w-20 bg-gray-300 rounded"></div>
+                    </div>
+
+                    <div className="h-4 bg-gray-300 rounded w-32"></div>
+                    <div className="h-3 bg-gray-300 rounded w-24"></div>
+                  </div>
                 </div>
-                <p className="text-gray-500 text-lg font-medium">{item.name}</p>
-                <p className="text-gray-600 text-sm font-semibold">
-                  {item.speciality}
-                </p>
+              ))
+          ) : filterDoc.length === 0 ? (
+            <p className="text-center col-span-full text-gray-500 text-lg">
+              No doctor available!
+            </p>
+          ) : (
+            filterDoc.map((item, index) => (
+              <div
+                key={index}
+                className="border border-blue-200 rounded-xl overflow-hidden cursor-pointer hover:translate-y-[-10px] transition-all duration-500"
+                onClick={() => {
+                  navigate(`/appointment/${item._id}`);
+                  scrollTo(0, 0);
+                }}
+              >
+                <img src={item.image} alt="" className="bg-blue-50" />
+                <div className="p-4">
+                  <div
+                    className={`flex items-center gap-2 text-sm text-center ${
+                      item.available ? "text-green-500" : "text-gray-500"
+                    }`}
+                  >
+                    <p
+                      className={`w-2 h-2 ${
+                        item.available ? "bg-green-500" : "bg-gray-500"
+                      } rounded-full`}
+                    ></p>
+                    <p>{item.available ? "Available" : "Not Available"}</p>
+                  </div>
+                  <p className="text-gray-500 text-lg font-medium">
+                    {item.name}
+                  </p>
+                  <p className="text-gray-600 text-sm font-semibold">
+                    {item.speciality}
+                  </p>
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
     </div>

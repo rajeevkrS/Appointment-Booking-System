@@ -4,8 +4,13 @@ import { AppContext } from "../../context/AppContext";
 import { assets } from "../../assets/assets";
 
 const AllAppointments = () => {
-  const { adminToken, appointments, getAllAppointments, appointmentCancel } =
-    useContext(AdminContext);
+  const {
+    adminToken,
+    appointments,
+    getAllAppointments,
+    appointmentCancel,
+    loadingAppointments,
+  } = useContext(AdminContext);
   const { calculateAge, slotDateFormat, currency } = useContext(AppContext);
   const [loading, setLoading] = useState(null);
 
@@ -19,6 +24,35 @@ const AllAppointments = () => {
       getAllAppointments();
     }
   }, [adminToken]);
+
+  // Show loading state
+  if (loadingAppointments) {
+    return (
+      <p className="m-5 text-center text-gray-500">Loading appointments...</p>
+    );
+  }
+
+  // Skeleton Loading State
+  // if (loadingAppointments) {
+  //   return (
+  //     <div className="w-full max-w-6xl m-5">
+  //       <p className="mb-3 text-lg font-medium">All Appointments</p>
+  //       <div className="bg-white border rounded text-sm max-h-[80vh] min-h-[60vh] overflow-y-scroll p-4">
+  //         {[...Array(10)].map((_, i) => (
+  //           <div key={i} className="flex gap-3 py-3 border-b animate-pulse">
+  //             <div className="w-6 h-6 bg-gray-200 rounded-full"></div>
+  //             <div className="flex-1 h-4 bg-gray-200 rounded"></div>
+  //             <div className="w-20 h-4 bg-gray-200 rounded"></div>
+  //             <div className="w-32 h-4 bg-gray-200 rounded"></div>
+  //             <div className="w-32 h-4 bg-gray-200 rounded"></div>
+  //             <div className="w-16 h-4 bg-gray-200 rounded"></div>
+  //             <div className="w-10 h-4 bg-gray-200 rounded"></div>
+  //           </div>
+  //         ))}
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   // Handle Cancel Appointment
   const handleCancel = async (appointmentId) => {
